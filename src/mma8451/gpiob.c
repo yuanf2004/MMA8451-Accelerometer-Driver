@@ -1,7 +1,7 @@
 #include "gpiob.h"
 
 // set up gpiob pb6 and pb7 for i2c
-void init_gpiob(){
+void init_gpiob(void){
     // activate rcc for gpiob
     RCC_AHB1ENR |= 0x1 << 1;
 

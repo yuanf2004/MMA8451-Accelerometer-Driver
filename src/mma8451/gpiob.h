@@ -15,4 +15,6 @@
 // both are alternate function 4
 #define GPIOB_AFRL *((uint32_t *)(0x40020400 + 0x20))
 
+void init_gpiob(void);
+
 #endif
