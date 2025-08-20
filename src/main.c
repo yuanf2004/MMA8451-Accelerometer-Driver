@@ -2,6 +2,8 @@
 #include "uart/systick.h"
 
 int main(){
+
+    // initialization
     init_systick();
     init_uart();
 
