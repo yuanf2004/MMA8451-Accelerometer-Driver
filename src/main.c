@@ -1,5 +1,5 @@
-#include "uart.h"
-#include "systick.h"
+#include "uart/uart.h"
+#include "uart/systick.h"
 
 int main(){
     init_systick();
