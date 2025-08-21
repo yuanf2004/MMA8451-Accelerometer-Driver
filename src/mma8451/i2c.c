@@ -1,6 +1,4 @@
 #include "i2c.h"
-#include "gpiob.h"
-#include "systick/systick.h"
 
 void init_i2c(void){
 

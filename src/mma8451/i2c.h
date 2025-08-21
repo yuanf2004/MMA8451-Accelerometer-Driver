@@ -14,6 +14,9 @@
 #define I2C1_TRISE *((uint32_t *)(0x40005400 + 0x20))
 
 #include <stdint.h>
+#include "gpiob.h"
+#include "systick/systick.h"
+
 
 void init_i2c(void);
     
