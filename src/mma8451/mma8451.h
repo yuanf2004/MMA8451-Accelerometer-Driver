@@ -22,4 +22,6 @@ void set_ctrl_reg1(uint8_t data);
 void set_active_mode(void);
 void set_standby_mode(void);
 
+uint16_t read_accel(char axis);
+
 #endif 

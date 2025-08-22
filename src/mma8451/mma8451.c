@@ -32,8 +32,8 @@ void master_send_ack(void){
 
 void master_clear_addr(void){
     // clear the address by reading sr1 and then sr2
-    volatile uint8_t temp = I2C1_SR1;
-    temp = I2C1_SR2;
+    volatile uint8_t buffer = I2C1_SR1;
+    buffer = I2C1_SR2;
 }
 
 void master_check_addr_sent(void){
@@ -70,27 +70,18 @@ void master_write_byte(uint8_t targetreg, uint8_t data){
 
     master_send_start();
 
-    //systick_sleep(1);
-
     // send slave address
     I2C1_DR = addr;
     master_check_addr_sent();
     master_clear_addr();
 
-    //systick_sleep(1);
-
     // send target reg
     I2C1_DR = targetreg;
     master_wait_txe();
-    master_clear_addr();
-
-    //systick_sleep(1);
 
     // send data 
     I2C1_DR = data;
     master_wait_btf();
-
-    //systick_sleep(1);
 
     master_send_stop();
 }
@@ -110,27 +101,22 @@ uint8_t master_read_byte(uint8_t targetreg){
         raddr = (0x1C << 1) | 0x1;
     }
 
-    master_send_start();
-
     // send slave address (w)
     master_send_start();
-    master_wait_txe();
+
     I2C1_DR = waddr;
-    master_wait_btf();
-    if(!master_wait_ack()) return 0; 
+    master_check_addr_sent();
+    master_clear_addr();
 
     // send register to read from
-    master_wait_txe();
     I2C1_DR = targetreg;
-    master_wait_btf();
-    if(!master_wait_ack()) return 0;
+    master_wait_txe();
 
     //repeated start condition, then send slave address (r)
     master_send_start();
-    master_wait_txe();
     I2C1_DR = raddr;
-    master_wait_btf();
-    if(!master_wait_ack()) return 0;
+    master_check_addr_sent();
+    master_clear_addr();
 
     // send nack
     master_send_nack();    
@@ -143,6 +129,35 @@ uint8_t master_read_byte(uint8_t targetreg){
     master_send_stop();
     return readval;
 }
+
+// todo: add a fast-mode for this sensor
+uint16_t read_accel(char axis){
+    uint8_t msb_addr, lsb_addr;
+    // 14-bit accel data
+    uint16_t accel = 0x0;
+    if(axis == 'x'){
+        msb_addr = 0x01;
+        lsb_addr = 0x02;
+    }
+    else if(axis == 'y'){
+        msb_addr = 0x03;
+        lsb_addr = 0x04;
+    }
+    else if(axis == 'z'){
+        msb_addr = 0x05;
+        lsb_addr = 0x06;
+    }
+    else{
+        // invalid argument
+        return 0;
+    }
+
+    // combine data together to get acceleration value
+    accel |= (master_read_byte(msb_addr)) << 8;
+    accel |= (master_read_byte(lsb_addr) >> 2);
+    return accel;
+}
+
 
 
 

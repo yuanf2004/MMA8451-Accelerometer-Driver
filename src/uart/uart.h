@@ -23,6 +23,7 @@
 #define USART2_CR1 *((volatile uint32_t *)(0x40004400 + 0x0C))
 
 #include <stdint.h>
+#include <stdio.h>
 
 void init_uart(void);
 
