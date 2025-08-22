@@ -1,7 +1,6 @@
 #include "i2c.h"
 
 void init_i2c(void){
-
     init_uart();
     init_systick();
     init_gpiob();
@@ -10,8 +9,8 @@ void init_i2c(void){
     RCC_APB1ENR |= (0x1 << 21);
 
     // i2c1 software reset on init
-    I2C1_CR1 &= ~(0x1 << 15);
     I2C1_CR1 |= (0x1 << 15);
+    I2C1_CR1 &= ~(0x1 << 15);
 
     //* SETTING THE CLOCK *
     // match input clock frequency, APB1 which is 42 MHz by default on st nucleo f446re
@@ -28,11 +27,11 @@ void init_i2c(void){
     // trise = (trise / tapb1) + 1 = 43
     I2C1_TRISE = 43;
 
-    // enable acks
-    I2C1_CR1 &= ~(0x1 << 10);
-    I2C1_CR1 |= 0x1 << 10;
-
     // enable i2c1 peripheral
     I2C1_CR1 &= ~(0x1);
     I2C1_CR1 |= 0x1;
+
+    // enable acks
+    I2C1_CR1 &= ~(0x1 << 10);
+    I2C1_CR1 |= 0x1 << 10;
 }

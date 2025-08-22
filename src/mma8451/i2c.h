@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include "gpiob.h"
 #include "systick/systick.h"
+#include "uart/uart.h"
 
 
 void init_i2c(void);

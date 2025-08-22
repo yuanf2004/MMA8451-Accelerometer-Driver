@@ -11,7 +11,7 @@
 // open drain
 #define GPIOB_OTYPER *((uint32_t *)(0x40020400 + 0x04))
 // pull up
-#define GPIOB_PUPDR *((uint32_t *)(0x4002040+ 0x0C))
+#define GPIOB_PUPDR *((uint32_t *)(0x40020400 + 0x0C))
 // both are alternate function 4
 #define GPIOB_AFRL *((uint32_t *)(0x40020400 + 0x20))
 

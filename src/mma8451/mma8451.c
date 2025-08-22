@@ -1,5 +1,8 @@
 #include "mma8451.h"
 
+// user adjustable
+uint8_t sa0 = 0;
+
 // TODO: at some point, split up helper functions with actual user functions
 
 // TODO: allow for config of ctrlreg and then set active mode with bitwise or 
@@ -25,6 +28,16 @@ void master_send_stop(void){
 void master_send_ack(void){
     // send ack from master
     I2C1_CR1 |= (0x1 << 10);
+}
+
+void master_clear_addr(void){
+    // clear the address by reading sr1 and then sr2
+    volatile uint8_t temp = I2C1_SR1;
+    temp = I2C1_SR2;
+}
+
+void master_check_addr_sent(void){
+    while(!(I2C1_SR1 & (0x1 << 1))){}
 }
 
 void master_send_nack(void){
@@ -57,23 +70,27 @@ void master_write_byte(uint8_t targetreg, uint8_t data){
 
     master_send_start();
 
+    //systick_sleep(1);
+
     // send slave address
-    master_wait_txe();
     I2C1_DR = addr;
-    master_wait_btf();
-    if(!master_wait_ack()) return;
-    
-    // send target register address
-    master_wait_txe();
+    master_check_addr_sent();
+    master_clear_addr();
+
+    //systick_sleep(1);
+
+    // send target reg
     I2C1_DR = targetreg;
-    master_wait_btf();
-    if(!master_wait_ack()) return;
+    master_wait_txe();
+    master_clear_addr();
+
+    //systick_sleep(1);
 
     // send data 
-    master_wait_txe();
     I2C1_DR = data;
     master_wait_btf();
-    if(!master_wait_ack()) return;
+
+    //systick_sleep(1);
 
     master_send_stop();
 }
@@ -100,20 +117,20 @@ uint8_t master_read_byte(uint8_t targetreg){
     master_wait_txe();
     I2C1_DR = waddr;
     master_wait_btf();
-    if(!master_wait_ack()) return;
+    if(!master_wait_ack()) return 0; 
 
     // send register to read from
     master_wait_txe();
     I2C1_DR = targetreg;
     master_wait_btf();
-    if(!master_wait_ack()) return;
+    if(!master_wait_ack()) return 0;
 
     //repeated start condition, then send slave address (r)
     master_send_start();
     master_wait_txe();
     I2C1_DR = raddr;
     master_wait_btf();
-    if(!master_wait_ack()) return;
+    if(!master_wait_ack()) return 0;
 
     // send nack
     master_send_nack();    
@@ -161,6 +178,7 @@ void set_ctrl_reg1(uint8_t data){
 }
 
 void set_active_mode(void){
+    // standby -> active
     set_ctrl_reg1(0x1);
 }
 

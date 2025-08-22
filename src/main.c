@@ -1,14 +1,10 @@
-#include "uart/uart.h"
-#include "systick/systick.h"
+#include "mma8451/mma8451.h"
 
 int main(){
-
-    // initialization
-    init_systick();
-    init_uart();
+    init_mma8451();
+    set_active_mode();
 
     while(1){
-        uart_print("testing!\r\n");
-        systick_sleep(1000);    
+
     }
 };

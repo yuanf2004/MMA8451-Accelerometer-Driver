@@ -1,14 +1,12 @@
 #ifndef UART_H
 #define UART_H
 
+#include "mma8451/gpiob.h"
+#include "mma8451/i2c.h"
+
 /* RCC BASE =  0x4002 3800*/
 
 /* Pins PA2 and PA3 */
-
-/* Enable GPIOA RCC */
-#define RCC_AHB1ENR *((volatile uint32_t*)(0x40023800 + 0x30))
-/* Enable USART2 RCC */
-#define RCC_APB1ENR *((volatile uint32_t*)(0x40023800 + 0x40))
 
 /* Config GPIOA Pins */
 #define GPIOA_MODER *((volatile uint32_t*)(0x40020000))
