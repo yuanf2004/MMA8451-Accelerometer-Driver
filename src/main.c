@@ -3,7 +3,7 @@
 
 int main(){
 
-    test_read_accel('z');
+    test_read_accel('x');
 
     while(1){
     }

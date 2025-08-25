@@ -11,19 +11,40 @@ void test_read_byte(void){
 void test_read_accel(char axis){
     // test to see if acceleration is being properly read 
     init_mma8451();
+    set_active_mode();
 
     while(1){  
         char accel_str[16];
-        uint16_t buffer = read_accel(axis);
-        sprintf(accel_str, "%u\r\n", buffer);   
+        int16_t buffer = read_accel(axis, 'r');
+        sprintf(accel_str, "%i\r\n\r\n", buffer);   
 
         //sleep for half a sec
         uart_print(accel_str);
-        systick_sleep(500);
+        systick_sleep(200);
     }
 };
 
+void test_read_all_accel(void){
+
+    init_mma8451();
+    set_active_mode();
+
+    while(1){
+        int16_t t_arr[3];
+        read_all_accel(t_arr, 'r');
+        
+        char msg[128];
+        sprintf(msg, "X axis: %i,\r\n Y axis: %i,\r\n Z axis: %i\r\n\r\n", t_arr[0], t_arr[1], t_arr[2]);
+        
+        uart_print(msg);
+        systick_sleep(1000);
+    }
+
+};
+
 void test_set_active_mode(void){
+// * no while loop
     init_mma8451();
     set_active_mode();
 }
+

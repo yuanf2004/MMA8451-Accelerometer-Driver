@@ -2,6 +2,7 @@
 #define MMA8451_H
 
 #include "i2c.h"
+#include "mm4a8451_helpers.h"
 
 // voltage on sa0 pin, user adjustable (0 or 1)
 extern uint8_t sa0;
@@ -22,6 +23,7 @@ void set_ctrl_reg1(uint8_t data);
 void set_active_mode(void);
 void set_standby_mode(void);
 
-uint16_t read_accel(char axis);
+int16_t read_accel(char axis, char mode);
+void read_all_accel(int16_t* i_arr, char mode);
 
 #endif 
