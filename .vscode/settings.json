@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "unity.h": "c",
-        "mma8451.h": "c"
+        "mma8451.h": "c",
+        "uart.h": "c"
     }
 }

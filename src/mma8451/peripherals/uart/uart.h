@@ -1,8 +1,8 @@
 #ifndef UART_H
 #define UART_H
 
-#include "mma8451/gpiob.h"
-#include "mma8451/i2c.h"
+#include "../gpiob/gpiob.h"
+#include "../i2c/i2c.h"
 
 /* RCC BASE =  0x4002 3800*/
 
