@@ -60,7 +60,7 @@ void set_active_mode_only(void);
 void set_standby_mode_only(void);
 int16_t read_accel(char axis, char mode);
 void read_all_accel(int16_t* i_arr, char mode);
-int16_t read_accel_converted(char axis, char mode, uint8_t fs);
-void read_all_accel_converted(int16_t* i_arr, char mode, uint8_t fs);
+float read_accel_converted(char axis, char mode, uint8_t fs);
+void read_all_accel_converted(float* i_arr, char mode, uint8_t fs);
 
 #endif 

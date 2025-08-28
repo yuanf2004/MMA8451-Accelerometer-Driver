@@ -203,8 +203,9 @@ int16_t read_accel(char axis, char mode){
 
     if(mode == 'r'){
         // combine data together to get acceleration value
-        accel |= (master_read_byte(msb_addr)) << 8;
-        accel |= (master_read_byte(lsb_addr) >> 2);
+        accel |= master_read_byte(msb_addr) << 8;
+        accel |= master_read_byte(lsb_addr);
+        accel >>= 2;
         return accel;
     }
     // fast mode (8 bits)
@@ -227,11 +228,11 @@ void read_all_accel(int16_t* i_arr, char mode){
 
     if(mode == 'r'){
         // fill input array
-        int16_t x = (buffer[0] << 8) | (buffer[1] >> 2);
+        int16_t x = (buffer[0] << 8) | (buffer[1]) >> 2;
         i_arr[0] = x;
-        int16_t y = (buffer[2] << 8) | (buffer[3] >> 2);
+        int16_t y = (buffer[2] << 8) | (buffer[3]) >> 2;
         i_arr[1] = y;
-        int16_t z = (buffer[4] << 8) | (buffer[5] >> 2);
+        int16_t z = (buffer[4] << 8) | (buffer[5]) >> 2;
         i_arr[2] = z;
     }
     else if(mode == 'f'){
@@ -248,21 +249,21 @@ void read_all_accel(int16_t* i_arr, char mode){
     }
 }
 
-int16_t read_accel_converted(char axis, char mode, uint8_t fs){
+float read_accel_converted(char axis, char mode, uint8_t fs){
     // function requires known full scale range for proper conversion
     // handle count based on full
-    uint16_t count;
+    float count;
     if(fs == 2) count = 4096;
     else if(fs == 4) count = 2048;
     else if(fs == 8) count = 1024;
     else return -1;
 
-    return read_accel(axis, mode) / count;
+    return read_accel(axis, mode) / count * 9.81;
 }
 
-void read_all_accel_converted(int16_t* i_arr, char mode, uint8_t fs){
+void read_all_accel_converted(float* i_arr, char mode, uint8_t fs){
     // function requires known full scale range for proper conversion
-    uint16_t count;
+    float count;
     if(fs == 2) count = 4096;
     else if(fs == 4) count = 2048;
     else if(fs == 8) count = 1024;
@@ -273,6 +274,6 @@ void read_all_accel_converted(int16_t* i_arr, char mode, uint8_t fs){
 
     // update all elements of the input array to match conversion
     for(int i = 0; i < 3; i++){
-        i_arr[i] =  xyz_buffer[i] / count;
+        i_arr[i] =  xyz_buffer[i] / count * 9.81;
     }
 }

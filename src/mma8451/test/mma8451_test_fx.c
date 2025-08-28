@@ -24,6 +24,36 @@ void test_read_accel(char axis){
     }
 };
 
+void test_read_accel_fmode(char axis){
+// testing fast mode 
+    init_mma8451();
+    // set active mode and fast mode
+    configure_ctrl_reg1(1, 1, 0, 0, 0);
+
+    while(1){
+        int8_t data = (int8_t) read_accel(axis, 'f');
+        char buffer[64]; 
+        sprintf(buffer, "Raw Fast Mode %c-Axis: %i\r\n", axis, data);
+        uart_print(buffer);
+        systick_sleep(500); 
+    }
+}
+//* left off writing out test function below
+
+void test_read_accel_converted(char axis){
+// testing proper acceleration conversion
+    init_mma8451();
+    set_active_mode_only();
+
+    while(1){
+        int accel = read_accel_converted(axis, 'r', 2);
+        char buffer[64];
+        sprintf(buffer, "%c-Axis is %i m/s^2\r\n", axis, accel);
+        uart_print(buffer);
+        systick_sleep(500);
+    }
+}
+
 void test_read_all_accel(void){
 
     init_mma8451();

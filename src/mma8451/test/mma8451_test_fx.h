@@ -4,6 +4,10 @@ void test_read_byte(void);
 
 void test_read_accel(char axis);
 
+void test_read_accel_fmode(char axis);
+
+void test_read_accel_converted(char axis);
+
 void test_set_active_mode(void);
 
 void test_read_all_accel(void);
