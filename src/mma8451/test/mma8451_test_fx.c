@@ -11,7 +11,7 @@ void test_read_byte(void){
 void test_read_accel(char axis){
     // test to see if acceleration is being properly read 
     init_mma8451();
-    set_active_mode();
+    set_active_mode_only();
 
     while(1){  
         char accel_str[16];
@@ -27,7 +27,7 @@ void test_read_accel(char axis){
 void test_read_all_accel(void){
 
     init_mma8451();
-    set_active_mode();
+    set_active_mode_only();
 
     while(1){
         int16_t t_arr[3];
@@ -45,6 +45,6 @@ void test_read_all_accel(void){
 void test_set_active_mode(void){
 // * no while loop
     init_mma8451();
-    set_active_mode();
+    set_active_mode_only();
 }
 

@@ -11,18 +11,155 @@ wiring configuration of your device's slave address 0 pin.
 proceed to use any functions within this API.
 */
 
-void configure_ctrl_reg1(uint8_t data){ 
-    // set the values of ctrl_reg1
+uint8_t mma8451_who_am_i(void){
+// check if sensor communication is functioning, successful return is 0x1A
+    return master_read_byte(0x0D);
+}
+
+// r_configure - raw configuration of registers with byte input
+
+void r_configure_ctrl_reg1(uint8_t data){ 
+    // write to ctrl_reg1
     master_write_byte(0x2A, data);
 }
 
-void set_active_mode(void){
-    // standby -> active
-    configure_ctrl_reg1(0x1);
+void r_configure_ctrl_reg2(uint8_t data){
+    // write to ctrl_reg2
+    master_write_byte(0x2B, data);
 }
 
-void set_standby_mode(void){
-    // set the device in standby mode (can allow configs)
+void r_configure_ctrl_reg3(uint8_t data){
+    // write to ctrl_reg2
+    master_write_byte(0x2C, data);
+}
+
+void r_configure_ctrl_reg4(uint8_t data){
+    // write to ctrl_reg2
+    master_write_byte(0x2D, data);
+}
+
+void r_configure_ctrl_reg5(uint8_t data){
+    // write to ctrl_reg2
+    master_write_byte(0x2E, data);
+}
+
+// configure - simplified ctrl_reg configurations 
+
+void configure_ctrl_reg1(
+    uint8_t active,
+    uint8_t f_read,
+    uint8_t lnoise,
+    uint8_t dr,
+    uint8_t aslp_rate
+){
+    /*
+    active - 0
+    f_read - 1
+    lnoise - 2
+    dr - [5:3]
+    aslp_rate [7:6] 
+    */
+    uint8_t config = 0x0;
+    config |= active;
+    config |= f_read << 1;
+    config |= lnoise << 2;
+    config |= dr << 3;
+    config |= aslp_rate << 6;
+
+    master_write_byte(0x2A, config);
+}
+
+void configure_ctrl_reg2(
+    uint8_t mods,
+    uint8_t slpe,
+    uint8_t smods,
+    uint8_t rst,
+    uint8_t st
+){
+    uint8_t config = 0x0;
+    config |= mods;
+    config |= slpe << 2;
+    config |= smods << 3;
+    config |= rst << 6;
+    config |= st << 7;
+
+    master_write_byte(0x2B, config);
+}
+
+void configure_ctrl_reg3(
+    uint8_t pp_od,
+    uint8_t ipol,
+    uint8_t wake_ff_mt,
+    uint8_t wake_pulse,
+    uint8_t wake_lndprt,
+    uint8_t wake_trans,
+    uint8_t fifo_gate
+){
+    uint8_t config;
+    config |= pp_od;
+    config |= ipol << 1;
+    config |= wake_ff_mt << 3;
+    config |= wake_pulse << 4;
+    config |= wake_lndprt << 5;
+    config |= wake_trans << 6;
+    config |= fifo_gate << 7;
+
+    master_write_byte(0x2C, config);
+}
+
+void configure_ctrl_reg4(
+    uint8_t int_en_drdy,
+    uint8_t int_en_ff_mt,
+    uint8_t int_en_pulse,
+    uint8_t int_en_lndprt,
+    uint8_t int_en_trans, 
+    uint8_t int_en_fifo,
+    uint8_t int_en_aslp
+){
+    uint8_t config;
+    config |= int_en_aslp;
+    config |= int_en_fifo << 2;
+    config |= int_en_trans << 3;
+    config |= int_en_lndprt << 4;
+    config |= int_en_pulse << 5;
+    config |= int_en_ff_mt << 6;
+    config |= int_en_drdy << 7;
+
+    master_write_byte(0x2C, config);
+}
+
+void configure_ctrl_reg5(
+    uint8_t int_cfg_drdy,
+    uint8_t int_cfg_ff_mt,
+    uint8_t int_cfg_pulse,
+    uint8_t int_cfg_lndprt,
+    uint8_t int_cfg_trans,
+    uint8_t int_cfg_fifo,
+    uint8_t int_cfg_aslp
+){
+    uint8_t config;
+    config |= int_cfg_drdy;
+    config |= int_cfg_ff_mt << 2;
+    config |= int_cfg_pulse << 3;
+    config |= int_cfg_lndprt << 4;
+    config |= int_cfg_trans << 5;
+    config |= int_cfg_fifo << 6;
+    config |= int_cfg_aslp << 7;
+
+    master_write_byte(0x2C, config);
+}
+
+void software_reset(void){
+}
+
+void set_active_mode_only(void){
+    // Only set active mode (sensing)
+    r_configure_ctrl_reg1(0x1);
+}
+
+void set_standby_mode_only(void){
+    // Only set standby mode (configuration)
+    r_configure_ctrl_reg1(0x0);
 }
 
 // todo: add a fast-mode for this sensor (8 bits only)
