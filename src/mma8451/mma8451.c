@@ -29,18 +29,23 @@ void r_configure_ctrl_reg2(uint8_t data){
 }
 
 void r_configure_ctrl_reg3(uint8_t data){
-    // write to ctrl_reg2
+    // write to ctrl_reg3
     master_write_byte(0x2C, data);
 }
 
 void r_configure_ctrl_reg4(uint8_t data){
-    // write to ctrl_reg2
+    // write to ctrl_reg4
     master_write_byte(0x2D, data);
 }
 
 void r_configure_ctrl_reg5(uint8_t data){
-    // write to ctrl_reg2
+    // write to ctrl_reg5
     master_write_byte(0x2E, data);
+}
+
+void r_configure_xyz_data_cfg(uint8_t data){
+    // write to xyz_data_cfg reg
+    master_write_byte(0x0E, data);
 }
 
 // configure - simplified ctrl_reg configurations 
@@ -125,7 +130,7 @@ void configure_ctrl_reg4(
     config |= int_en_ff_mt << 6;
     config |= int_en_drdy << 7;
 
-    master_write_byte(0x2C, config);
+    master_write_byte(0x2D, config);
 }
 
 void configure_ctrl_reg5(
@@ -146,9 +151,21 @@ void configure_ctrl_reg5(
     config |= int_cfg_fifo << 6;
     config |= int_cfg_aslp << 7;
 
-    master_write_byte(0x2C, config);
+    master_write_byte(0x2E, config);
 }
 
+void configure_xyz_data_cdg(
+    uint8_t fs,
+    uint8_t hpf_out
+){
+    uint8_t config;
+    config |= fs;
+    config |= hpf_out << 4;
+    
+    master_write_byte(0x0E, config);
+}
+
+//todo: need to write this
 void software_reset(void){
 }
 
@@ -162,8 +179,8 @@ void set_standby_mode_only(void){
     r_configure_ctrl_reg1(0x0);
 }
 
-// todo: add a fast-mode for this sensor (8 bits only)
 int16_t read_accel(char axis, char mode){
+    // regular mode (14 bits)
     uint8_t msb_addr, lsb_addr;
     // 14-bit accel data
     uint16_t accel = 0x0;
@@ -184,24 +201,78 @@ int16_t read_accel(char axis, char mode){
         return 0;
     }
 
-    // combine data together to get acceleration value
-    accel |= (master_read_byte(msb_addr)) << 8;
-    accel |= (master_read_byte(lsb_addr) >> 2);
-    return accel;
+    if(mode == 'r'){
+        // combine data together to get acceleration value
+        accel |= (master_read_byte(msb_addr)) << 8;
+        accel |= (master_read_byte(lsb_addr) >> 2);
+        return accel;
+    }
+    // fast mode (8 bits)
+    else if(mode == 'f'){
+        accel |= (master_read_byte(msb_addr));
+        return accel;
+    }
+    else{
+        // invalid char
+        return -1;
+    }
 }
 
-// todo: add a fast-mode for this sensor (8 bits only)
 void read_all_accel(int16_t* i_arr, char mode){
     // INPUT MUST BE OF SIZE 3 or MORE
     // fill input array with x, y, and z values
+
     uint8_t buffer[6];
     master_read_bytes(buffer, 0x01, 6);
 
-    // fill input array
-    int16_t x = (buffer[0] << 8) | (buffer[1] >> 2);
-    i_arr[0] = x;
-    int16_t y = (buffer[2] << 8) | (buffer[3] >> 2);
-    i_arr[1] = y;
-    int16_t z = (buffer[4] << 8) | (buffer[5] >> 2);
-    i_arr[2] = z;
+    if(mode == 'r'){
+        // fill input array
+        int16_t x = (buffer[0] << 8) | (buffer[1] >> 2);
+        i_arr[0] = x;
+        int16_t y = (buffer[2] << 8) | (buffer[3] >> 2);
+        i_arr[1] = y;
+        int16_t z = (buffer[4] << 8) | (buffer[5] >> 2);
+        i_arr[2] = z;
+    }
+    else if(mode == 'f'){
+        int8_t x = buffer[0];
+        i_arr[0] = x;
+        int8_t y = buffer[1];
+        i_arr[1] = y;
+        int8_t z = buffer[2];
+        i_arr[2] = z;
+    }
+    else{
+        // invalid mode
+        return;
+    }
+}
+
+int16_t read_accel_converted(char axis, char mode, uint8_t fs){
+    // function requires known full scale range for proper conversion
+    // handle count based on full
+    uint16_t count;
+    if(fs == 2) count = 4096;
+    else if(fs == 4) count = 2048;
+    else if(fs == 8) count = 1024;
+    else return -1;
+
+    return read_accel(axis, mode) / count;
+}
+
+void read_all_accel_converted(int16_t* i_arr, char mode, uint8_t fs){
+    // function requires known full scale range for proper conversion
+    uint16_t count;
+    if(fs == 2) count = 4096;
+    else if(fs == 4) count = 2048;
+    else if(fs == 8) count = 1024;
+    else return;
+    
+    int16_t xyz_buffer[3];
+    read_all_accel(xyz_buffer, mode);
+
+    // update all elements of the input array to match conversion
+    for(int i = 0; i < 3; i++){
+        i_arr[i] =  xyz_buffer[i] / count;
+    }
 }
