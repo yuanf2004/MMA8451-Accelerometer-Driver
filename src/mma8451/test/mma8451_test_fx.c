@@ -20,7 +20,7 @@ void test_read_accel(char axis){
 
         //sleep for half a sec
         uart_print(accel_str);
-        systick_sleep(200);
+        systick_sleep(1000);
     }
 };
 
@@ -31,7 +31,7 @@ void test_read_accel_fmode(char axis){
     configure_ctrl_reg1(1, 1, 0, 0, 0);
 
     while(1){
-        int8_t data = (int8_t) read_accel(axis, 'f');
+        int data = (int) read_accel(axis, 'f');
         char buffer[64]; 
         sprintf(buffer, "Raw Fast Mode %c-Axis: %i\r\n", axis, data);
         uart_print(buffer);
@@ -54,6 +54,26 @@ void test_read_accel_converted(char axis){
     }
 }
 
+void test_read_all_accel_converted(void){
+    init_mma8451();
+    set_active_mode_only();
+
+    while(1){
+        float t_arr[3];
+        read_all_accel_converted(t_arr, 'r', 2);
+
+        char msg[128];
+        sprintf(msg, 
+            "X axis: %i m/s^2,\r\n Y axis: %im/s^2,\r\n Z axis: %im/s^2\r\n\r\n",
+            (int16_t) t_arr[0],
+            (int16_t) t_arr[1],
+            (int16_t) t_arr[2]);
+    
+        uart_print(msg);
+        systick_sleep(1000);
+    }
+}
+
 void test_read_all_accel(void){
 
     init_mma8451();
@@ -67,7 +87,7 @@ void test_read_all_accel(void){
         sprintf(msg, "X axis: %i,\r\n Y axis: %i,\r\n Z axis: %i\r\n\r\n", t_arr[0], t_arr[1], t_arr[2]);
         
         uart_print(msg);
-        systick_sleep(1000);
+        systick_sleep(250);
     }
 
 };

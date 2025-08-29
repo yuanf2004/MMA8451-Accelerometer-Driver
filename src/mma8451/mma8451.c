@@ -183,7 +183,7 @@ int16_t read_accel(char axis, char mode){
     // regular mode (14 bits)
     uint8_t msb_addr, lsb_addr;
     // 14-bit accel data
-    uint16_t accel = 0x0;
+    int16_t accel = 0x0;
     if(axis == 'x'){
         msb_addr = 0x01;
         lsb_addr = 0x02;
@@ -206,11 +206,18 @@ int16_t read_accel(char axis, char mode){
         accel |= master_read_byte(msb_addr) << 8;
         accel |= master_read_byte(lsb_addr);
         accel >>= 2;
+        if(accel & 0x2000){
+            accel |= 0xC000;
+        }
+
         return accel;
     }
     // fast mode (8 bits)
     else if(mode == 'f'){
         accel |= (master_read_byte(msb_addr));
+        if(accel & 0x80){
+            accel |= 0xFF00;
+        }
         return accel;
     }
     else{
@@ -228,19 +235,38 @@ void read_all_accel(int16_t* i_arr, char mode){
 
     if(mode == 'r'){
         // fill input array
-        int16_t x = (buffer[0] << 8) | (buffer[1]) >> 2;
+        int16_t xtest = buffer[0];
+        int16_t x = (buffer[0] << 8 | buffer[1]) >> 2;
+        if(x & 0x2000){
+            x |= 0xC000;
+        }
         i_arr[0] = x;
-        int16_t y = (buffer[2] << 8) | (buffer[3]) >> 2;
+        int16_t y = (buffer[2] << 8 | buffer[3]) >> 2;
+        if(y & 0x2000){
+            y |= 0xC000;
+        }
         i_arr[1] = y;
-        int16_t z = (buffer[4] << 8) | (buffer[5]) >> 2;
+        int16_t z = (buffer[4] << 8 | buffer[5]) >> 2;
+        if(z & 0x2000){
+            z |= 0xC000;
+        }
         i_arr[2] = z;
     }
-    else if(mode == 'f'){
+    else if(mode == 'f'){ 
         int8_t x = buffer[0];
+        if(x & 0x80){
+            x |= 0xFF00;
+        }
         i_arr[0] = x;
         int8_t y = buffer[1];
+        if(y & 0x80){
+            y |= 0xFF00;
+        }
         i_arr[1] = y;
         int8_t z = buffer[2];
+        if(z & 0x80){
+            z |= 0xFF00;
+        }
         i_arr[2] = z;
     }
     else{
