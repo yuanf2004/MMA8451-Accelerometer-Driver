@@ -154,7 +154,8 @@ void configure_ctrl_reg5(
     master_write_byte(0x2E, config);
 }
 
-void configure_xyz_data_cdg(
+void configure_xyz_data_cfg
+(
     uint8_t fs,
     uint8_t hpf_out
 ){
