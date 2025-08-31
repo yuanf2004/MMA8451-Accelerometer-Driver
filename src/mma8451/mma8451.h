@@ -51,7 +51,7 @@ void configure_ctrl_reg5(
     uint8_t int_cfg_fifo,
     uint8_t int_cfg_aslp
 );
-void configure_xyz_data_cdg(
+void configure_xyz_data_cfg(
     uint8_t fs,
     uint8_t hpf_out
 );
