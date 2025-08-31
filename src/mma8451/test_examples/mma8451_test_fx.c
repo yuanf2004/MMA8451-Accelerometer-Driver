@@ -16,7 +16,7 @@ void test_read_accel(char axis){
     while(1){  
         char accel_str[16];
         int16_t buffer = read_accel(axis, 'r');
-        sprintf(accel_str, "%i\r\n\r\n", buffer);   
+        sprintf(accel_str, "Raw %c-Axis: %i\r\n", axis, buffer);   
 
         //sleep for half a sec
         uart_print(accel_str);
