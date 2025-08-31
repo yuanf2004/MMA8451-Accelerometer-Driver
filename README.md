@@ -1,6 +1,6 @@
 # MMA8451 Accelerometer Driver API 
 
-This project is an I2C-based driver API written for the MMA8451 Accelerometer in bare metal C. The API allows for the configuration of the sensor whilst in standby mode (8-bit fast mode data reading and full scale range value) and the reading of values for the X, Y, and Z axes (raw and converted).
+This repository is an I2C-based driver API written for the MMA8451 Accelerometer in bare metal C. The API allows for the configuration of the sensor whilst in standby mode (8-bit fast mode data reading and full scale range value) and the reading of acceleration values for the X, Y, and Z axes (raw and converted).
 
 # How to Set Up and Use
 
@@ -20,6 +20,17 @@ The MMA8451 sensor has two different modes that it can be in, Standby Mode and A
 
 # UART Example Terminal Output Screenshots
 
+All Axes, Raw Data<br>
+![All Axes Raw Data](src/mma8451/images_examples/raw_all_axes.png)<br><br>
+
+All Axes, Converted Data<br>
+![All Axes Converted Data](src/mma8451/images_examples/converted_all_axes.png)<br><br>
+
+Singular Axis in Regular Mode<br>
+![Raw Axis Regular Mode](src/mma8451/images_examples/raw_axis_regular.png)<br><br>
+
+Singular Axis in Fast Mode<br>
+![Raw Axis Fast Mode](src/mma8451/images_examples/raw_axis_fast.png)<br><br>
 
 
 # Functions
@@ -74,4 +85,6 @@ https://www.adafruit.com/product/2019?srsltid=AfmBOorL9qwDZYYb3YobpwR4gcqpDrOQlW
 MMA8451 Technical Reference Manual:
 
 https://www.nxp.com/docs/en/data-sheet/MMA8451Q.pdf
+
+## Thank you for checking out this project!
 
